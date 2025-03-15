@@ -3,14 +3,17 @@ package kubernetes_watchers
 import (
 	"context"
 	"fmt"
+	"github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
+	"github.com/joostvdg/kube-app-version-info/internal/applications"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/util/json"
+	"k8s.io/client-go/dynamic/dynamicinformer"
 	"os"
 
 	"github.com/rs/zerolog/log"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
-	argo "github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
@@ -53,48 +56,63 @@ type KubernetesWatcher struct {
 	DynamicClient dynamic.Interface
 }
 
-func (w *KubernetesWatcher) WatchArgoCDApplications() {
+func (w *KubernetesWatcher) WatchArgoCDApplications(storage applications.Store) {
 	gvr := schema.GroupVersionResource{Group: "argoproj.io", Version: "v1alpha1", Resource: "applications"}
-	resourceInterface := w.DynamicClient.Resource(gvr).Namespace(metav1.NamespaceAll)
 
-	dynamicInformer := cache.NewSharedInformer(
-		&cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return resourceInterface.List(context.TODO(), options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return resourceInterface.Watch(context.TODO(), options)
-			},
-		},
-		&unstructured.Unstructured{},
-		0, // resync period, set to 0 to disable
-		cache.Indexers{},
-	)
+	log.Info().Msg("Watching ArgoCD Applications")
+	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(w.DynamicClient, 0, metav1.NamespaceAll, nil)
 
-	dynamicInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	log.Info().Msg("Creating informer")
+	informer := factory.ForResource(gvr).Informer()
+	log.Info().Msg("Adding event handler")
+	_, err := informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			app, ok := obj.(*argo.Application)
-			if ok {
-				log.Info().Msgf("New ArgoCD Application detected: %s", app.Name)
-				// Process and store application version
+			argoApp, err := transformToArgoApp(obj)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to transform to ArgoCD Application")
+				return
 			}
+			applications.ProcessArgoCDApplication(storage, argoApp)
 		},
 		UpdateFunc: func(oldObj, newObj interface{}) {
-			app, ok := newObj.(*argo.Application)
-			if ok {
-				log.Info().Msgf("Updated ArgoCD Application detected: %s", app.Name)
-				// Update version tracking
+			argoApp, err := transformToArgoApp(newObj)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to transform to ArgoCD Application")
+				return
 			}
+			applications.ProcessArgoCDApplication(storage, argoApp)
 		},
 		DeleteFunc: func(obj interface{}) {
-			app, ok := obj.(*argo.Application)
-			if ok {
-				log.Info().Msgf("Deleted ArgoCD Application: %s", app.Name)
+			argoApp, err := transformToArgoApp(obj)
+			if err != nil {
+				log.Error().Err(err).Msg("Failed to transform to ArgoCD Application")
+				return
 			}
+			applications.ProcessArgoCDApplication(storage, argoApp)
 		},
 	})
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to add event handler")
+		return
+	}
 
 	stopCh := make(chan struct{})
 	defer close(stopCh)
-	dynamicInformer.Run(stopCh)
+	informer.Run(stopCh)
+}
+
+func transformToArgoApp(obj interface{}) (*v1alpha1.Application, error) {
+	unstructuredObj := obj.(*unstructured.Unstructured)
+	jsonData, err := unstructuredObj.MarshalJSON()
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to marshal unstructured object to JSON")
+		return nil, err
+	}
+	app := &v1alpha1.Application{}
+	err = json.Unmarshal(jsonData, app)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to unmarshal JSON to ArgoCD Application")
+		return nil, err
+	}
+	return app, nil
 }

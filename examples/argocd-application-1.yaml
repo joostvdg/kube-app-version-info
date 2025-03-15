@@ -20,4 +20,4 @@ spec:
   sources:
     - repoURL: https://github.com/argoproj/argocd-example-apps.git
       path: guestbook
-      targetRevision: HEAD
+      targetRevision: guestbook-v0.1

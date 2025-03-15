@@ -9,6 +9,20 @@ require (
 	github.com/spf13/viper v1.19.0
 	k8s.io/apimachinery v0.31.2
 	k8s.io/client-go v0.31.2
+	k8s.io/cluster-bootstrap v0.31.2
+	k8s.io/controller-manager v0.31.2
+	k8s.io/cri-api v0.31.2
+	k8s.io/cri-client v0.31.2
+	k8s.io/csi-translation-lib v0.31.2
+	k8s.io/dynamic-resource-allocation v0.31.2
+	k8s.io/endpointslice v0.31.2
+	k8s.io/kube-controller-manager v0.31.2
+	k8s.io/kube-proxy v0.31.2
+	k8s.io/kube-scheduler v0.31.2
+	k8s.io/kubelet v0.31.2
+	k8s.io/mount-utils v0.31.2
+	k8s.io/pod-security-admission v0.31.2
+	k8s.io/sample-apiserver v0.31.2
 )
 
 require (
@@ -163,19 +177,6 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.17.1 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.4-0.20241211184406-7bf59b3d70ee // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
-	k8s.io/cloud-provider v0.31.2
-	k8s.io/cluster-bootstrap v0.31.2
-	k8s.io/controller-manager v0.31.2
-	k8s.io/cri-api v0.31.2
-	k8s.io/cri-client v0.31.2
-	k8s.io/csi-translation-lib v0.31.2
-	k8s.io/dynamic-resource-allocation v0.31.2
-	k8s.io/endpointslice v0.31.2
-	k8s.io/kube-controller-manager v0.31.2
-	k8s.io/kube-proxy v0.31.2
-	k8s.io/kube-scheduler v0.31.2
-	k8s.io/kubelet v0.31.2
-	k8s.io/mount-utils v0.31.2
-	k8s.io/pod-security-admission v0.31.2
-	k8s.io/sample-apiserver v0.31.2
+	k8s.io/cloud-provider v0.31.2 // indirect
+
 )

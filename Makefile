@@ -6,7 +6,7 @@ MAIN_GO :=
 
 .PHONY: build
 build:
-	CGO_ENABLED=0 go build -o bin/$(NAME) cmd/server/main.go
+	CGO_ENABLED=0 go build -v -o bin/$(NAME) cmd/server/main.go
 
 .PHONY: buildc
 buildc:

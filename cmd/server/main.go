@@ -1,11 +1,13 @@
 package main
 
 import (
+	"github.com/joostvdg/kube-app-version-info/internal/applications"
 	"github.com/joostvdg/kube-app-version-info/internal/kubernetes_watchers"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"net/http"
@@ -37,16 +39,26 @@ func main() {
 		panic(err.Error())
 	}
 
+	// Initialize the in-memory store
+	inMemoryStore := applications.NewInMemoryStore()
+
 	// create the clientset
 	clientset, err2 := kubernetes.NewForConfig(config)
 	if err2 != nil {
 		panic(err.Error())
 	}
 
-	argoAppsWatcher := kubernetes_watchers.KubernetesWatcher{
-		Clientset: clientset,
+	// Create a dynamic client
+	dynamicClient, err := dynamic.NewForConfig(config)
+	if err != nil {
+		panic(err.Error())
 	}
-	argoAppsWatcher.WatchArgoCDApplications()
+
+	argoAppsWatcher := kubernetes_watchers.KubernetesWatcher{
+		Clientset:     clientset,
+		DynamicClient: dynamicClient,
+	}
+	argoAppsWatcher.WatchArgoCDApplications(inMemoryStore)
 
 	echoPort := ":" + port.(string)
 	e.Logger.Fatal(e.Start(echoPort))
