@@ -1,0 +1,26 @@
+name: Generate Version on Pull Request
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  generate-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Read versionBase from ci.yaml
+        id: read_version_base
+        run: |
+          versionBase=$(grep 'versionBase' ci.yaml | awk '{print $2}')
+          echo "versionBase=$versionBase" >> $GITHUB_ENV
+
+      - name: Generate version number
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/joostvdg/git-next-tag:1.2.0-alpine \
+            --baseTags ${{ env.versionBase }} --path /workspace/version.txt -vvv --preRelease --suffix rc
