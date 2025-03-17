@@ -10,8 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout repository with tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history including tags
+
+      - name: List Git tags
+        run: git tag
 
       - name: Read versionBase from ci.yaml
         id: read_version_base
