@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c26969ca-aa6d-43d4-a1c9-d553c5ea5bf8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.github/workflows/main-stable-tag.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/main-stable-tag.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/pull-request-rc-tag.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/pull-request-rc-tag.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/test-branch-commit-tag.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/test-branch-commit-tag.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,7 +120,9 @@
       <workItem from="1741730711466" duration="132000" />
       <workItem from="1741730871300" duration="2090000" />
       <workItem from="1741899144387" duration="4343000" />
-      <workItem from="1742044203688" duration="3065000" />
+      <workItem from="1742044203688" duration="5197000" />
+      <workItem from="1742120799602" duration="3048000" />
+      <workItem from="1742244307796" duration="1984000" />
     </task>
     <servers />
   </component>
