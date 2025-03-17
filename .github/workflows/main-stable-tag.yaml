@@ -24,4 +24,11 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
             ghcr.io/joostvdg/git-next-tag:1.2.0-alpine \
-            --baseTags ${{ env.versionBase }} --path /workspace/version.txt -vvv
+            --baseTag ${{ env.versionBase }} \
+            --path /workspace \ 
+            --outputPath /workspace/version.txt \
+            -vvv
+
+      - name: Print version number
+        run: |
+          cat /workspace/version.txt

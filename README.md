@@ -24,6 +24,11 @@ kubectl apply -f examples/argocd-application-1.yaml
 argocd app create guestbook --repo https://github.com/argoproj/argocd-example-apps.git --path guestbook --dest-server https://kubernetes.default.svc --dest-namespace default
 ```
 
+## Versioning Local Test
+
+```bash
+docker run --rm -v $(pwd):/workspace ghcr.io/joostvdg/git-next-tag:1.2.0-alpine --baseTag 0.1 --path /workspace --outputPath /workspace/version.txt -vvv
+```
 
 ## References
 
